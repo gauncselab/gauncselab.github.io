@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>GAÜN AI Lab</title>
+<style>
+:root{--fg:#1f2328;--bg:#fff;--soft:#59636e;--link:#0969da}
+@media (prefers-color-scheme:dark){:root{--fg:#e6edf3;--bg:#0d1117;--soft:#9198a1;--link:#4493f8}}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;max-width:34rem;margin:14vh auto;padding:0 16px;text-align:center;color:var(--fg);background:var(--bg);line-height:1.5}
+a{color:var(--link);word-break:break-all}
+small{color:var(--soft)}
+</style>
+</head>
+<body>
+<h1>GAÜN AI Lab</h1>
+<p id="m">Güncel adres alınıyor…</p>
+<p><small id="n"></small></p>
+<noscript><p>JavaScript kapalı. Güncel adres: <a href="adres.json">adres.json</a></p></noscript>
+<script>
+(function () {
+  var m = document.getElementById('m'), n = document.getElementById('n');
+  function yaz(html, not) { m.innerHTML = html; n.textContent = not || ''; }
+  fetch('/adres.json?t=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+    .then(function (d) {
+      if (d.state === 'active' && d.url && /^https:\/\/[a-z0-9-]+\.trycloudflare\.com$/.test(d.url)) {
+        var p = location.pathname === '/' || location.pathname === '/index.html' || location.pathname === '/404.html' ? '/' : location.pathname;
+        var hedef = d.url + p + location.search + location.hash;
+        var a = document.createElement('a'); a.href = hedef; a.textContent = d.url.replace('https://', '');
+        m.textContent = 'Yönlendiriliyorsunuz: '; m.appendChild(a);
+        n.textContent = 'Sayfa açılmazsa tünel yeni yeniden başlamış olabilir; 2 dakika sonra bu sayfayı yenileyin.';
+        location.replace(hedef);
+      } else {
+        yaz('Dış erişim şu an kapalı.', 'Son güncelleme: ' + (d.updated || '?') + '. Yöneticiye haber verin.');
+      }
+    })
+    .catch(function () { yaz('Adres alınamadı.', 'Birkaç dakika sonra sayfayı yenileyin.'); });
+})();
+</script>
+</body>
+</html>
